@@ -10,7 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// 生成 JWT 令牌
+// Create 生成 JWT 令牌
 func Create(secret string, data map[string]interface{}, exp int64) (token, short string, err error) {
 	// Create Token
 	Token := jwt.New(jwt.SigningMethodHS256)
@@ -30,12 +30,12 @@ func Create(secret string, data map[string]interface{}, exp int64) (token, short
 	}
 
 	// md5
-	short = tool.Md5(token)
+	short = tool.MD5(token)
 
 	return
 }
 
-// 解析 JWT 令牌
+// Parse 解析 JWT 令牌
 func Parse(token, secret string) (bytes []byte, err error) {
 	tokenObj, err := jwt.Parse(token, func(token *jwt.Token) (k interface{}, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

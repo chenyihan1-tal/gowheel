@@ -10,18 +10,21 @@ import (
 	"golang.org/x/text/transform"
 )
 
+// GbkToUtf8 ...
 func GbkToUtf8(src []byte) (str []byte, err error) {
 	reader := transform.NewReader(bytes.NewReader(src), simplifiedchinese.GBK.NewDecoder())
 	str, err = ioutil.ReadAll(reader)
 	return
 }
 
+// Utf8ToGbk ...
 func Utf8ToGbk(src []byte) (str []byte, err error) {
 	reader := transform.NewReader(bytes.NewReader(src), simplifiedchinese.GBK.NewEncoder())
 	str, err = ioutil.ReadAll(reader)
 	return
 }
 
+// RemoveHtml ...
 func RemoveHtml(src string) string {
 	// 将HTML标签全转换成小写
 	re, _ := regexp.Compile("<[\\S\\s]+?>")

@@ -10,21 +10,28 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/satori/go.uuid"
 )
 
-// MD5加密
-func Md5(data interface{}) string {
-	marshal, _ := json.Marshal(data)
+// MD5 加密
+func MD5(data interface{}) string {
 	h := md5.New()
-	h.Write(marshal)
+
+	if reflect.TypeOf(data).Name() == "string" {
+		h.Write([]byte(data.(string)))
+	} else {
+		marshal, _ := json.Marshal(data)
+		h.Write(marshal)
+	}
+
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// 获取指定长度的随机字符串
+// RandStr 获取指定长度的随机字符串
 func RandStr(length int) string {
 	str := uuid.NewV4().String()
 
@@ -43,14 +50,14 @@ func RandStr(length int) string {
 	return str[0:length]
 }
 
-// 发送HTTP请求
+// Request 发送HTTP请求
 func Request(method, url string, data, header map[string]interface{}) (body []byte, err error) {
 	marshal, _ := json.Marshal(data)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, bytes.NewReader(marshal))
 	if err != nil {
-		return 
+		return
 	}
 
 	for k, v := range header {
@@ -59,7 +66,7 @@ func Request(method, url string, data, header map[string]interface{}) (body []by
 
 	res, err := client.Do(req)
 	if err != nil {
-		return 
+		return
 	}
 
 	defer res.Body.Close()
@@ -68,7 +75,7 @@ func Request(method, url string, data, header map[string]interface{}) (body []by
 	return
 }
 
-// base64 图片解码
+// DecBase64Img base64 图片解码
 func DecBase64Img(base64Str string) (data []byte, extension string, err error) {
 	if base64Str[11] == 'j' {
 		extension = ".jpg"
@@ -86,10 +93,10 @@ func DecBase64Img(base64Str string) (data []byte, extension string, err error) {
 	return
 }
 
-// in_array 
+// InArray ...
 func InArray(need interface{}, needArr []interface{}) bool {
-	for _,v := range needArr{
-		if need == v{
+	for _, v := range needArr {
+		if need == v {
 			return true
 		}
 	}
