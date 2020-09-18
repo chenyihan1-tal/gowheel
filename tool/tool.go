@@ -20,13 +20,25 @@ import (
 // MD5 加密
 func MD5(data interface{}) string {
 	h := md5.New()
+	var hBody []byte
 
-	if reflect.TypeOf(data).Name() == "string" {
-		h.Write([]byte(data.(string)))
-	} else {
-		marshal, _ := json.Marshal(data)
-		h.Write(marshal)
+	marshal, _ := json.Marshal(data)
+	hBody = marshal
+
+	if reflect.TypeOf(data).String() == "string" {
+		hBody = []byte(data.(string))
 	}
+	if strings.Contains(reflect.TypeOf(data).String(), "int") {
+		hBody = []byte(fmt.Sprintf("%v", data))
+	}
+	if strings.Contains(reflect.TypeOf(data).String(), "float") {
+		hBody = []byte(fmt.Sprintf("%v", data))
+	}
+	if strings.Contains(reflect.TypeOf(data).String(), "[]uint8") {
+		hBody = data.([]byte)
+	}
+
+	h.Write(hBody)
 
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -35,18 +47,20 @@ func MD5(data interface{}) string {
 func RandStr(length int) string {
 	str := uuid.NewV4().String()
 
+	str = MD5(str)
 	rStr := []rune(str)
+
 	for i := 0; i < len(rStr); i++ {
 		rand.Seed(time.Now().UnixNano())
-		randI := rand.Intn(30)
-		s := fmt.Sprintf("%c", rStr[i])
-		if (randI-i)%2 == 0 {
-			str = strings.Replace(str, s, strings.ToUpper(s), 1)
-		}
+		randI := rand.Intn(len(rStr))
+		s := fmt.Sprintf("%c", rStr[randI])
+		str = strings.Replace(str, s, strings.ToUpper(s), 1)
 	}
+
 	if length > len([]rune(str)) {
 		length = len([]rune(str))
 	}
+
 	return str[0:length]
 }
 
