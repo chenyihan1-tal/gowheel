@@ -66,6 +66,8 @@ func RandStr(length int) string {
 
 // Request 发送HTTP请求
 func Request(method, url string, data, header map[string]interface{}) (body []byte, err error) {
+	url = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(url,"\n", "")," ",""),"\r","")
+
 	marshal, _ := json.Marshal(data)
 
 	client := &http.Client{}
