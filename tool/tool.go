@@ -66,13 +66,14 @@ func RandStr(length int) string {
 
 // Request 发送HTTP请求
 func Request(method, url string, data, header map[string]interface{}) (body []byte, err error) {
-	url = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(url,"\n", "")," ",""),"\r","")
+	url = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(url, "\n", ""), " ", ""), "\r", "")
 
 	marshal, _ := json.Marshal(data)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, bytes.NewReader(marshal))
 	if err != nil {
+		err = fmt.Errorf("new request fail: %s", err.Error())
 		return
 	}
 
@@ -82,11 +83,16 @@ func Request(method, url string, data, header map[string]interface{}) (body []by
 
 	res, err := client.Do(req)
 	if err != nil {
+		err = fmt.Errorf("do request fail: %s", err.Error())
 		return
 	}
 
 	defer res.Body.Close()
 	body, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		err = fmt.Errorf("read res body fail: %s", err.Error())
+		return
+	}
 
 	return
 }
